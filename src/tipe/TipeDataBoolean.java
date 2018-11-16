@@ -5,7 +5,7 @@ public class TipeDataBoolean{
         Boolean isValid = false;
         System.out.println(
             "Nilai dari variable isValid adalah "
-            +(isValid ? "Benar" : "Salah")
+            +(isValid ? "Salah" : "Benar")
         );
     }
 }
