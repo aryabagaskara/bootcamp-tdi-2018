@@ -1,0 +1,69 @@
+--number 1 : column operation
+select
+	CONCAT(e.first_name,' ',e.last_name) as Nama_Lengkap,
+	d.department_name as Nama_Department,
+	e.salary as Gaji_Sebulan,
+	case
+	 when coalesce(e.commission_pct,0)=0
+	  then 'Tidak Memiliki Komisi'
+	else
+	 concat(e.commission_pct*e.salary) end as Mendapatkan_Komisi,
+	case
+	 when coalesce(e.commission_pct,0)=0
+	  then e.salary
+	else
+	 e.salary+(e.salary*e.commission_pct) end as Gaji_terima
+	from
+	employees e left join departments d on(e.department_id=d.department_id);
+
+--number 2 : manager sort
+select
+	CONCAT(e.first_name,' ',e.last_name) as Nama_Karyawan,
+	d.department_name as nama_bagian,
+	case
+	when coalesce(e.manager_id,0)=0
+	 then 'Saya tidak punya manager'
+	else
+	 CONCAT(m.first_name,' ',m.last_name) end as Nama_Manager,
+	j.job_title as Nama_Jabatan
+	from
+	employees e left join departments d on(e.department_id=d.department_id)
+	left join jobs j on (e.job_id=j.job_id)
+	left join employees m on (e.manager_id=m.employee_id)
+	order by m.first_name,e.first_name;
+
+--number 3 : sorted total salary grouped by dept
+select
+ d.department_id as dep_id,
+ d.department_name as dep_name,
+ (sum(e.salary)) as total_salary
+ from employees e join departments d on(e.department_id=d.department_id)
+ group by d.department_id
+ order by sum(e.salary) desc;
+
+--number 4 : no null
+select
+ e.salary*12 as gaji_setahun,
+ count(e.*) as jumlah_karyawan
+ from employees e 
+ where coalesce(e.commission_pct,0)>0
+ group by e.salary
+ order by e.salary*12 desc;
+
+
+--number 5 : subquery
+select
+ e.employee_id as kode_karyawan,
+ CONCAT(e.first_name,' ',e.last_name) as Nama_Lengkap,
+ e.salary as gaji_karyawan,
+ j.job_title as jabatan,
+ e.email as email
+ from 
+ employees e left join jobs j on(e.job_id=j.job_id)
+ where
+ e.salary >= any (
+  select
+   max(j.max_salary) as gaji_maksimal
+   from
+    jobs j
+   where j.job_id='IT_PROG');
